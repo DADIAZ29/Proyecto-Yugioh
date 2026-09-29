@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> Yu-Gi-Oh </title>
+    <link rel="stylesheet" href="{% static 'cards/styles.css' %}">
+</head>
+
+<body>
+    <header class="page-header">
+        <h1>Cartas Blue-Eyes</h1>
+    </header>
+    <main class="page-content">
+        {% if unavailable %}
+        <p class="message" role="status">No fue posible conectar con la API. Comprueba tu conexión e inténtalo de nuevo.
+        </p>
+        {% elif not cards %}
+        <p class="message" role="status">La API no devolvió cartas para este arquetipo.</p>
+        {% endif %}
+
+        <section class="card-grid" aria-label="Cartas del arquetipo Blue-Eyes">
+            {% for card in cards %}
+            <a class="card-item" href="{% url 'card_detail' card.id %}">
+                <img src="{{ card.card_images.0.image_url }}" alt="Ilustración de {{ card.name }}" loading="lazy">
+                <div class="card-item-info">
+                    <h2>{{ card.name }}</h2>
+                    <p>{{ card.type }}</p>
+                    {% with price=card.card_prices.0 %}
+                    {% if price %}
+                    <p>Precio: ${{ price.tcgplayer_price }} USD</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </a>
+            {% empty %}
+            {% if not unavailable %}<p>No hay cartas para mostrar.</p>{% endif %}
+            {% endfor %}
+        </section>
+    </main>
+</body>
+
+</html>

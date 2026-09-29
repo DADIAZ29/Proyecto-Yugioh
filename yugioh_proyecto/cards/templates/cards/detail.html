@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if card %}{{ card.name }} |{% else %}Archivo no disponible |{% endif %} Duel Archive</title>
+    <link rel="stylesheet" href="{% static 'cards/styles.css' %}">
+</head>
+
+<body>
+    <header class="topbar">
+        <a class="back-link" href="{% url 'home' %}"> <span>REGRESAR</span></a>
+    </header>
+    <main class="detail-main">
+        {% if unavailable %}
+        <div class="notice detail-notice" role="status">No fue posible conectar con la API. Vuelve al archivo e
+            inténtalo de nuevo.</div>
+        {% elif card %}
+        <div class="detail-layout">
+            <section class="detail-gallery" aria-label="Imágenes de {{ card.name }}">
+                <div class="detail-main-art"><img class="main-image" src="{{ card.card_images.0.image_url }}"
+                        alt="Ilustración de {{ card.name }}"><span class="detail-art-caption">CARD NO. {{ card.id
+                        }}</span></div>
+                {% if card.card_images|length > 1 %}
+                <div class="image-strip" aria-label="Imágenes adicionales">{% for image in card.card_images %}<a
+                        href="{{ image.image_url }}" target="_blank" rel="noopener"
+                        aria-label="Abrir imagen {{ forloop.counter }}"><img
+                            src="{{ image.image_url_small|default:image.image_url }}"
+                            alt="Vista {{ forloop.counter }} de {{ card.name }}"></a>{% endfor %}</div>
+                {% endif %}
+            </section>
+            <section class="detail-copy">
+                <h1>{{ card.name }}</h1>
+                <dl class="card-attributes">
+                    <div>
+                        <dt>Tipo</dt>
+                        <dd>{{ card.type }}</dd>
+                    </div>
+                    {% if card.attribute %}<div>
+                        <dt>Atributo</dt>
+                        <dd>{{ card.attribute }}</dd>
+                    </div>{% endif %}
+                    {% if card.atk != None %}<div>
+                        <dt>ATK</dt>
+                        <dd>{{ card.atk }}</dd>
+                    </div>{% endif %}
+                    {% if card.def != None %}<div>
+                        <dt>DEF</dt>
+                        <dd>{{ card.def }}</dd>
+                    </div>{% endif %}
+                    {% if card.level != None %}<div>
+                        <dt>Nivel</dt>
+                        <dd>{{ card.level }}</dd>
+                    </div>{% endif %}
+                </dl>
+                {% if card.desc %}<section class="detail-section">
+                    <h2>Descripción</h2>
+                    <p class="card-description">{{ card.desc }}</p>
+                </section>{% endif %}
+                {% if card.card_prices %}
+                <section class="detail-section">
+                    <h2>Precios (USD)</h2>
+                    <dl class="price-list">{% with price=card.card_prices.0 %}<div>
+                            <dt>TCGPlayer</dt>
+                            <dd>${{ price.tcgplayer_price }}</dd>
+                        </div>
+                        <div>
+                            <dt>Cardmarket</dt>
+                            <dd>${{ price.cardmarket_price }}</dd>
+                        </div>
+                        <div>
+                            <dt>eBay</dt>
+                            <dd>${{ price.ebay_price }}</dd>
+                        </div>{% endwith %}
+                    </dl>
+                </section>
+                {% endif %}
+            </section>
+        </div>
+        {% endif %}
+    </main>
+</body>
+
+</html>
